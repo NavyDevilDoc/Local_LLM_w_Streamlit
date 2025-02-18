@@ -48,7 +48,7 @@ class ModelManager:
         """
         try:
             self.llm_type = selected_llm_type.upper()
-            
+            ollama_base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
             compute_settings = self.compute_manager.get_compute_settings()
             
             if selected_llm_type.lower() != "ollama":
@@ -56,6 +56,7 @@ class ModelManager:
                 
             return ChatOllama(
                 model=selected_llm,
+                base_url = ollama_base_url,
                 top_k=compute_settings['top_k'],
                 top_p=compute_settings['top_p'],
                 temperature=compute_settings['temperature'],
