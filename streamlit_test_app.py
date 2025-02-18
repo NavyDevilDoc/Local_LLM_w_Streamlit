@@ -57,6 +57,47 @@ def main():
         layout="wide"
     )
 
+
+    # Add custom CSS styling
+    st.markdown(
+        """
+        <style>
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+        }
+
+        .stChatMessageContent {
+            max-width: 90%;
+            margin-left: calc(var(--sidebar-width, 17rem) + 1rem);
+        }
+
+        [data-testid="stChatInput"] {
+            position: fixed;
+            bottom: 0;
+            left: calc(var(--sidebar-width, 17rem) + 1rem);
+            right: 1rem;
+            padding: 1rem;
+            z-index: 1000;
+            transition: left 0.3s ease;
+        }
+
+        .main .block-container {
+            padding-bottom: 5rem;
+            margin-left: var(--sidebar-width, 17rem);
+            transition: margin-left 0.3s ease;
+        }
+
+        .stChatMessage {
+            margin-left: calc(var(--sidebar-width, 17rem) + 1rem);
+            transition: margin-left 0.3s ease;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
     st.title("💭 Chat with Granite")
     initialize_session_state()
 
