@@ -1,7 +1,7 @@
-from Driver_streamlit import Driver_streamlit
+from Driver_streamlit import Driver
 from TextPreprocessor import TextPreprocessor
 
-def initiate_llm(driver: Driver_streamlit) -> None:
+def initiate_llm(driver: Driver) -> None:
     """
     Initialize LLM interface and manage chat session.
     
