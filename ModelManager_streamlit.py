@@ -48,7 +48,6 @@ class ModelManager:
         """
         try:
             self.llm_type = selected_llm_type.upper()
-            self.compute_manager.test_gpu_details()
             
             compute_settings = self.compute_manager.get_compute_settings()
             
