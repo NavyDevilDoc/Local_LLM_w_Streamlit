@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from tqdm import tqdm
 import sys
-from ModelManager import ModelManager
+from ModelManager_streamlit import ModelManager
 from langchain_core.output_parsers import StrOutputParser
 
 
