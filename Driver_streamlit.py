@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional
-from LLMQueryManager_streamlit import LLMQueryManager_streamlit
+from LLMQueryManager_streamlit import LLMQueryManager
 
 
 class Driver:
