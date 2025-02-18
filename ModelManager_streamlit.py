@@ -1,3 +1,4 @@
+import os
 from typing import List, Any, Dict, Tuple
 from langchain_ollama import ChatOllama
 from ComputeResourceManager_streamlit import ComputeResourceManager
