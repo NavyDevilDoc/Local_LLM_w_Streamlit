@@ -1,9 +1,6 @@
 # TextPreprocessor.py
 
 import logging
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 import re
 from typing import List
 
@@ -12,12 +9,10 @@ class TextPreprocessor:
     def __init__(self):
         """Initialize the text preprocessor with required NLTK resources."""
         try:
-            self.stopwords = set(stopwords.words('english'))
-            self.lemmatizer = WordNetLemmatizer()
             self.logger = logging.getLogger(__name__)
             
         except Exception as e:
-            self.logger.error(f"Failed to initialize NLTK resources: {e}")
+            self.logger.error(f"Failed to initialize: {e}")
             raise
 
 
@@ -102,8 +97,4 @@ class TextPreprocessor:
         result.extend(indent + line for line in lines[1:])
         
         return '\n'.join(result)
-
-    def count_tokens(self, text: str) -> int:
-        """Count the number of tokens in the text."""
-        return len(word_tokenize(text))
 
