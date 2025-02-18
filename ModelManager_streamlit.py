@@ -1,6 +1,6 @@
 from typing import List, Any, Dict, Tuple
 from langchain_ollama import ChatOllama
-from ComputeResourceManager import ComputeResourceManager
+from ComputeResourceManager_streamlit import ComputeResourceManager
 
 
 class ModelManager:
