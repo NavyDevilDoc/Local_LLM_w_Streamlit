@@ -1,6 +1,6 @@
 from pathlib import Path
-from Setup import initiate_llm
-from Driver import Driver
+from Setup_streamlit import initiate_llm
+from Driver_streamlit import Driver_streamlit
 
 def main() -> None:
     """Initialize and run the LLM interface with Ollama."""
