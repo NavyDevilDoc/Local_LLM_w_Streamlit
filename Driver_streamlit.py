@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional
-from LLMQueryManager import LLMQueryManager
+from LLMQueryManager_streamlit import LLMQueryManager_streamlit
 
 
 class Driver:
@@ -21,7 +21,7 @@ class Driver:
         self.llm_model = llm_model
         
         # Initialize LLM query manager
-        self.llm_query = LLMQueryManager(
+        self.llm_query = LLMQueryManager_streamlit(
             llm_type=llm_type,
             llm_model=llm_model
         )
