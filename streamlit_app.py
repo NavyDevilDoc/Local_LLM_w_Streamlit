@@ -224,12 +224,23 @@ def main():
     # Sidebar controls
     with st.sidebar:
         st.header("Model Settings")
+
+        temperature = st.slider(
+            "Temperature",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.2,
+            step=0.05,
+            help="Higher values make output more creative, lower more deterministic"
+        )
+
         llm_type = st.selectbox(
             "Select LLM Type",
             ["ollama", "openai"],
             help="Choose between local Ollama models or OpenAI"
         )
         
+
         # Model selection based on type
         if llm_type == "ollama":
             model_options = [
@@ -239,18 +250,22 @@ def main():
                 "llama3.2:3b-instruct-fp16"
             ]
         else:
-            model_options = "gpt-4o"
+            model_options = [
+                "gpt-4o", 
+                "gpt-4o-mini"
+            ]
             
         llm_model = st.selectbox("Select Model", model_options)
-        
-        temperature = st.slider(
-            "Temperature",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.7,
-            step=0.1,
-            help="Higher values make output more creative, lower more deterministic"
-        )
+
+        # If model changed, reinitialize
+        if ('current_model' not in st.session_state or 
+            st.session_state.current_model != llm_model):
+            st.session_state.driver = initialize_driver(llm_type, llm_model, temperature)
+            st.session_state.current_model = llm_model
+            st.success(f"Switched to model: {llm_model}"
+            )
+
+
         
 #=======================================================================================================#
 
@@ -273,20 +288,59 @@ def main():
                     st.warning("No conversation to save!")
 
         with save_col2:
+            if 'show_new_chat_dialog' not in st.session_state:
+                st.session_state.show_new_chat_dialog = False
+
             if st.button("🗑️ New Conversation"):
-                if st.session_state.messages:
-                    if st.warning("Save current conversation?"):
-                        save_path = save_conversation_dialog(
-                            st.session_state.messages,
-                            os.getenv("JSON_PATH")
-                        )
-                        if save_path:
-                            st.success(f"Previous conversation saved as: {os.path.basename(save_path)}")
+                st.session_state.show_new_chat_dialog = True
+
+            # Show dialog if needed
+            if st.session_state.show_new_chat_dialog and st.session_state.messages:
+                st.warning("Save current conversation?")
+                # Use radio buttons instead of columns
+                save_choice = st.radio(
+                    "Choose an option:",
+                    ["Save & Start New", "Start New Without Saving", "Cancel"],
+                    key="new_chat_choice",
+                    help="Select how to handle the current conversation"
+                )
+                
+                if save_choice == "Save & Start New":
+                    save_path = save_conversation_dialog(
+                        st.session_state.messages,
+                        os.getenv("JSON_PATH")
+                    )
+                    if save_path:
+                        st.success(f"Previous conversation saved as: {os.path.basename(save_path)}")
+                    st.session_state.messages = []
+                    st.session_state.driver = initialize_driver(
+                        st.session_state.driver.llm_type,
+                        st.session_state.driver.llm_model
+                    )
+                    st.session_state.show_new_chat_dialog = False
+                    st.rerun()
+                
+                elif save_choice == "Start New Without Saving":
+                    st.session_state.messages = []
+                    st.session_state.driver = initialize_driver(
+                        st.session_state.driver.llm_type,
+                        st.session_state.driver.llm_model
+                    )
+                    st.session_state.show_new_chat_dialog = False
+                    st.rerun()
+                
+                elif save_choice == "Cancel":
+                    st.session_state.show_new_chat_dialog = False
+                    st.rerun()
+            
+            # If no messages, just start new conversation
+            elif st.session_state.show_new_chat_dialog:
                 st.session_state.messages = []
                 st.session_state.driver = initialize_driver(
                     st.session_state.driver.llm_type,
                     st.session_state.driver.llm_model
                 )
+                st.session_state.show_new_chat_dialog = False
                 st.success("Started new conversation!")
 
         # Second row: Load and Export
@@ -368,59 +422,6 @@ def main():
         st.session_state.driver = initialize_driver(llm_type, llm_model, temperature)
     if 'messages' not in st.session_state:
         st.session_state.messages = []
-    
-    # Add some custom CSS to create a fixed input box at the bottom
-    st.markdown(
-        """
-        <style>
-        /* Chat container */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 100px);
-        }
-
-        /* Messages area */
-        .stChatMessageContent {
-            max-width: 90%;
-            margin-left: calc(var(--sidebar-width, 17rem) + 1rem);
-        }
-
-        /* Input area - fully dynamic positioning */
-        [data-testid="stChatInput"] {
-            position: fixed;
-            bottom: 0;
-            left: calc(var(--sidebar-width, 17rem) + 1rem); /* Dynamic left position */
-            right: 1rem;
-            padding: 1rem;
-            z-index: 1000;
-            transition: left 0.3s ease; /* Smooth transition when sidebar resizes */
-        }
-
-        /* Main content container adjustments */
-        .main .block-container {
-            padding-bottom: 5rem;
-            margin-left: var(--sidebar-width, 17rem);
-            transition: margin-left 0.3s ease;
-        }
-
-        /* Chat message positioning */
-        .stChatMessage {
-            margin-left: calc(var(--sidebar-width, 17rem) + 1rem);
-            transition: margin-left 0.3s ease;
-        }
-
-        /* Remove extra padding */
-        .main .block-container {
-            padding-bottom: 5rem;
-            margin-left: var(--sidebar-width, 17rem);
-            transition: margin-left 0.3s ease;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
     
     # Chat messages area
     chat_container = st.container()
